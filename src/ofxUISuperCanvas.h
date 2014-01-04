@@ -235,7 +235,22 @@ public:
     virtual void loadSettings(string fileName)
     {
         ofxXmlSettings *XML = new ofxXmlSettings();
-        XML->loadFile(fileName);                
+        XML->loadFile(fileName);
+		
+		//JG HACK
+		//set all toggles back to default
+		for(vector<ofxUIWidget *>::iterator it = widgets.begin(); it != widgets.end(); ++it)
+		{
+			ofxUIWidget *w = (*it);
+			if(w->getKind() == OFX_UI_WIDGET_LABELTOGGLE &&
+			   w->getParent() != NULL && (w->getParent()->getKind() == OFX_UI_WIDGET_RADIO ||
+										  w->getParent()->getKind() == OFX_UI_WIDGET_DROPDOWNLIST))
+		   {
+			   ((ofxUIToggle*)w)->setValue(false);
+		   }			   
+		}
+		
+		//JG END HACK
         int widgetTags = XML->getNumTags("Widget");
         for(int i = 0; i < widgetTags; i++)
         {
