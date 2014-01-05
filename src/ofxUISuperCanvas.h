@@ -234,9 +234,6 @@ public:
     
     virtual void loadSettings(string fileName)
     {
-        ofxXmlSettings *XML = new ofxXmlSettings();
-        XML->loadFile(fileName);
-		
 		//JG HACK
 		//set all toggles back to default
 		for(vector<ofxUIWidget *>::iterator it = widgets.begin(); it != widgets.end(); ++it)
@@ -251,6 +248,12 @@ public:
 		}
 		
 		//JG END HACK
+		ofxXmlSettings *XML = new ofxXmlSettings();
+        if(!XML->loadFile(fileName)){
+			return;
+		}
+		
+	
         int widgetTags = XML->getNumTags("Widget");
         for(int i = 0; i < widgetTags; i++)
         {
@@ -267,12 +270,14 @@ public:
             }
             XML->popTag();
         }
-        XML->pushTag("Canvas", 0);
-        int value = XML->getValue("IsMinified", (bIsMinified ? 1 : 0), 0);
-        setMinified((value ? 1 : 0));
-        rect->setX(XML->getValue("XPosition", rect->getX(), 0));
-        rect->setY(XML->getValue("YPosition", rect->getY(), 0));
-        XML->popTag();        
+		if(XML->tagExists("Canvas", 0)){
+			XML->pushTag("Canvas", 0);
+			int value = XML->getValue("IsMinified", (bIsMinified ? 1 : 0), 0);
+			setMinified((value ? 1 : 0));
+			rect->setX(XML->getValue("XPosition", rect->getX(), 0));
+			rect->setY(XML->getValue("YPosition", rect->getY(), 0));
+			XML->popTag();
+		}
         hasKeyBoard = false;
         delete XML;
     }
